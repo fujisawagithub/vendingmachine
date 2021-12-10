@@ -1,14 +1,14 @@
 class Drink
 
-  @@drink = { "コーラ": { "price": 120, "stock": 5},
-          "水": { "price": 100, "stock": 5},
-          "レッドブル": { "price": 200, "stock": 5 }}
+  @@drink = { "コーラ": { "price": 120, "stock": 1},
+          "水": { "price": 100, "stock": 1},
+          "レッドブル": { "price": 200, "stock": 1 }}
   
   def get_drink_stock(select_drink)
     @@drink[select_drink][:stock]
   end
 
-  def set_drink_stock(select_drink)
+  def set_drink_stock=(select_drink)
     @@drink[select_drink][:stock] -= 1
   end 
 
@@ -29,9 +29,8 @@ class Drink
     @@drink.keys.select{|n|
       drink = n.to_sym
       @@drink[drink][:stock] > 0
-    }.map{|n| n.to_s}
+    }#.map{|n| n.to_s}
   end
-
 
 
   def check_price(select_drink, total_money)

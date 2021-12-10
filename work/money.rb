@@ -36,12 +36,12 @@ class Money
   end
 end
 
-
 class  Purchasing < Money
+  #attr_reader 
 
   def initialize
+    super
     @sales_amount = 0
-    @slot_money = 0
   end
 
   def get_sales_amount

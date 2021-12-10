@@ -40,19 +40,7 @@ class Main
         @purchasing.return_money
         break
       end
-      # 欲しい飲み物の選択 
-      puts "欲しい飲み物を選択してください。"
-      
-      # stockがあるもののみ表示する (check_stockがいらなくなる)
-      # puts "[コーラ, 水, レッドブル]"
-      @select_drink = gets.chomp.to_sym
-      # 表示された飲み物以外が入力された場合は、再度入力し直す。
-      @check_price = @drink.check_price(@select_drink, @total_money)
-      if @check_price == false
-        @answer = "y"
-        next
-      end
-      # "売上金額を増やす"
+      decide_drink
       calc_accounting_processing
     end
     puts "ありがとうございました！"
@@ -119,8 +107,29 @@ class Main
     end
   end
 
+  def decide_drink
+    able_select_drink_list = @drink.get_stock_drink_list.select { |n|
+      @total_money >= @drink.get_drink_price(n) 
+    }.map{|n| n.to_s}
+    p able_select_drink_list
+    while true
+      puts "欲しい飲み物を選択してください。"
+      @select_drink = gets.chomp.to_sym
+      break if able_select_drink_list.include?(@select_drink.to_s)
+    end
+  end
+
+  def calc_accounting_processing
+    drink_price = @drink.get_drink_price(@select_drink)
+    @sales_amount = @purchasing.add_sales_amount(drink_price)
+    @total_money = @purchasing.get_current_slot_money
+    @drink.set_drink_stock=(@select_drink)
+    set_purchased_drinks
+    puts "#{@select_drink.to_s}が出力されました！"
+
+  end
+
   def set_purchased_drinks
-    { "コーラ": { "stock": 5} }
     @purchased_drink = {} if @purchased_drink.nil?
     if @purchased_drink.keys.include?(@select_drink)
       @purchased_drink[@select_drink][:stock] += 1
@@ -131,13 +140,4 @@ class Main
   end
 
 
-
-  def calc_accounting_processing
-    drink_price = @drink.get_drink_price(@select_drink)
-    @sales_amount = @purchasing.add_sales_amount(drink_price)
-    @drink.set_drink_stock(@select_drink)
-    set_purchased_drinks
-    puts "#{@select_drink.to_s}が出力されました！"
-    @total_money = @purchasing.get_current_slot_money
   end
-end
