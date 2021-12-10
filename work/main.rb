@@ -17,7 +17,6 @@ class Main
       get_current_status
       branch_route
       break if @close_program == true
-      # お金挿入
       while @answer == "y" do
         puts "投入出来るお金は[10, 50, 100, 500, 1000]円です。"
         puts "お金を投入してください。"
@@ -33,7 +32,6 @@ class Main
         puts "------------------------------"
         confirm_slot_again_money
       end
-      #払い戻し確認
       puts "払い戻しを行いますか？(y/n)"
       ask_answer
       if @answer == "y"
@@ -46,6 +44,7 @@ class Main
     puts "ありがとうございました！"
   end
 
+  private
 
   def get_current_status
     puts "------------------------------"
@@ -126,7 +125,6 @@ class Main
     @drink.set_drink_stock=(@select_drink)
     set_purchased_drinks
     puts "#{@select_drink.to_s}が出力されました！"
-
   end
 
   def set_purchased_drinks
@@ -139,5 +137,4 @@ class Main
     end
   end
 
-
-  end
+end
