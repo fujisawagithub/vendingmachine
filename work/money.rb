@@ -1,6 +1,7 @@
 class Money
 
   MONEY = [10, 50, 100, 500, 1000].freeze
+  UNUSED_MONEY = [1, 5, 2000, 5000, 10000].freeze
 
   def initialize
     @slot_money = 0
@@ -22,8 +23,8 @@ class Money
     @slot_money += money
   end
 
-  def subtract_slot_money(money)
-    @slot_money -= money
+  def check_unused_money(money)
+    return true if UNUSED_MONEY.include?(money)
   end
 
   # 払い戻し操作を行うと、投入金額の総計を釣り銭として出力する。
@@ -37,16 +38,18 @@ end
 
 
 class  Purchasing < Money
-  @sales_amount = 0
-  amount = 0
-  #balance = amount - price
+
+  def initialize
+    @sales_amount = 0
+    @slot_money = 0
+  end
 
   def get_sales_amount
     @sales_amount
   end
 
   def add_sales_amount(price)
+    @slot_money -= price
     @sales_amount += price
-    @slot_money 
   end
 end
