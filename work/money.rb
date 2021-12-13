@@ -11,18 +11,19 @@ class Money
     @slot_money
   end
 
-  def slot_money(money) 
-    return false unless MONEY.include?(money)
-    @slot_money += money
-  end
-
-  def check_unused_money(money)
-    return true if UNUSED_MONEY.include?(money)
-  end
-
   def return_money
     puts "#{@slot_money}円払い戻しました！"
     @slot_money = 0
+  end
+
+  def slot_money(money)
+    unless MONEY.include?(money)
+      puts "扱えないお金です。"
+      puts "投入された#{money}円を返却します。" if UNUSED_MONEY.include?(money)
+      get_current_slot_money 
+    else
+      @slot_money += money
+    end
   end
 end
 

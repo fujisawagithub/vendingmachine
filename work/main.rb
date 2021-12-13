@@ -16,17 +16,13 @@ class Main
     while true
       get_current_status
       branch_route
+      # ↓をbranch_routeの中へ
       break if @close_program == true
       while @answer == "y" do
         puts "投入出来るお金は[10, 50, 100, 500, 1000]円です。"
         puts "お金を投入してください。"
         put_money = gets.chomp.to_i
         @total_money = @purchasing.slot_money(put_money)
-        if @total_money == false
-          puts "扱えないお金です。"
-          puts "投入された#{put_money}円を返却します。" if @purchasing.check_unused_money(put_money)
-          @total_money = @purchasing.get_current_slot_money
-        end
         puts "------------------------------"
         puts "投入金額：#{@total_money}円" 
         puts "------------------------------"
@@ -70,6 +66,7 @@ class Main
   def branch_route
     if @select_drink.nil? || @purchased_drink != nil
       @close_program = ask_anything_want
+      #break if @close_program == true
       return if @close_program == true
     end
     confirm_slot_again_money unless @purchased_drink.nil?
@@ -118,6 +115,7 @@ class Main
     end
   end
 
+  # ↓のメソッドをpurchasingクラスへ
   def calc_accounting_processing
     drink_price = @drink.get_drink_price(@select_drink)
     @sales_amount = @purchasing.add_sales_amount(drink_price)
@@ -127,6 +125,7 @@ class Main
     puts "#{@select_drink.to_s}が出力されました！"
   end
 
+  # ↓のメソッドをdrinkクラスへ
   def set_purchased_drinks
     @purchased_drink = {} if @purchased_drink.nil?
     if @purchased_drink.keys.include?(@select_drink)
