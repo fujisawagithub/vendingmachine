@@ -1,4 +1,7 @@
 class Main
+  require './drink.rb'
+  require './money.rb'
+
 
   def initialize
     @total_money = 0
@@ -8,15 +11,12 @@ class Main
   end
 
   def run
-    require './drink.rb'
-    require './money.rb'
     @drink = Drink.new
     @purchasing = Purchasing.new
     puts "いらっしゃいませ！"
     while true
       get_current_status
       branch_route
-      # ↓をbranch_routeの中へ
       break if @close_program == true
       while @answer == "y" do
         puts "投入出来るお金は[10, 50, 100, 500, 1000]円です。"
@@ -34,11 +34,12 @@ class Main
         @purchasing.return_money
         break
       end
-      decide_drink
-      calc_accounting_processing
+      @select_drink = @drink.able_select_drink_list(@total_money)
+      set_arguments_process
     end
     puts "ありがとうございました！"
   end
+
 
   private
 
@@ -51,10 +52,10 @@ class Main
     puts "------------------------------"
     puts "本日の売上高：#{@sales_amount}円"
     puts "------------------------------"
-    unless @purchased_drink.nil?
+    unless @purchased_drinks.nil?
       puts "【購入済み】"
-      @purchased_drink.keys.each do |n|
-        stock = @purchased_drink[n][:stock]
+      @purchased_drinks.keys.each do |n|
+        stock = @purchased_drinks[n][:stock]
         n = n.to_s
         puts "#{n}：#{stock}本"
         puts "------------------------------"
@@ -64,12 +65,11 @@ class Main
 
 
   def branch_route
-    if @select_drink.nil? || @purchased_drink != nil
+    if @select_drink.nil? || @purchased_drinks != nil
       @close_program = ask_anything_want
-      #break if @close_program == true
       return if @close_program == true
     end
-    confirm_slot_again_money unless @purchased_drink.nil?
+    confirm_slot_again_money unless @purchased_drinks.nil?
   end
 
   def ask_anything_want
@@ -103,37 +103,14 @@ class Main
     end
   end
 
-  def decide_drink
-    able_select_drink_list = @drink.get_stock_drink_list.select { |n|
-      @total_money >= @drink.get_drink_price(n) 
-    }.map{|n| n.to_s}
-    p able_select_drink_list
-    while true
-      puts "欲しい飲み物を選択してください。"
-      @select_drink = gets.chomp.to_sym
-      break if able_select_drink_list.include?(@select_drink.to_s)
-    end
-  end
-
-  # ↓のメソッドをpurchasingクラスへ
-  def calc_accounting_processing
-    drink_price = @drink.get_drink_price(@select_drink)
-    @sales_amount = @purchasing.add_sales_amount(drink_price)
+  def set_arguments_process
+    select_drink_price = @drink.get_drink_price(@select_drink)
+    @sales_amount = @purchasing.set_sales_amount=(select_drink_price)
     @total_money = @purchasing.get_current_slot_money
     @drink.set_drink_stock=(@select_drink)
-    set_purchased_drinks
+    @drink.set_purchased_drinks=(@select_drink)
+    @purchased_drinks = @drink.get_purchased_drinks
     puts "#{@select_drink.to_s}が出力されました！"
-  end
-
-  # ↓のメソッドをdrinkクラスへ
-  def set_purchased_drinks
-    @purchased_drink = {} if @purchased_drink.nil?
-    if @purchased_drink.keys.include?(@select_drink)
-      @purchased_drink[@select_drink][:stock] += 1
-    else 
-      @purchased_drink[@select_drink] = {}
-      @purchased_drink[@select_drink].store(:stock, 1)
-    end
   end
 
 end

@@ -34,8 +34,14 @@ class  Purchasing < Money
     @sales_amount = 0
   end
 
-  def add_sales_amount(price)
+  def set_sales_amount=(price)
     @slot_money -= price
     @sales_amount += price
   end
+
+  def get_sales_amount
+    @sales_amount
+  end
+
+
 end
