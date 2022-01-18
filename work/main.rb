@@ -1,18 +1,16 @@
 class Main
-  require './drink.rb'
-  require './money.rb'
-
+  require './drink_stock.rb'
+  require './money_purchasing.rb'
 
   def initialize
     @total_money = 0
     @sales_amount = 0
-    @check_price = false
     @answer = "y"
   end
 
   def run
-    @drink = Drink.new
-    @purchasing = Purchasing.new
+    @drink = Stock.new
+    @money = Purchasing.new
     puts "いらっしゃいませ！"
     while true
       get_current_status
@@ -22,7 +20,7 @@ class Main
         puts "投入出来るお金は[10, 50, 100, 500, 1000]円です。"
         puts "お金を投入してください。"
         put_money = gets.chomp.to_i
-        @total_money = @purchasing.slot_money(put_money)
+        @total_money = @money.slot_money(put_money)
         puts "------------------------------"
         puts "投入金額：#{@total_money}円" 
         puts "------------------------------"
@@ -31,10 +29,11 @@ class Main
       puts "払い戻しを行いますか？(y/n)"
       ask_answer
       if @answer == "y"
-        @purchasing.return_money
+        @money.return_money
         break
       end
-      @select_drink = @drink.able_select_drink_list(@total_money)
+      able_select_drink_list(@total_money)
+      @select_drink = decide_drink
       set_arguments_process
     end
     puts "ありがとうございました！"
@@ -46,7 +45,7 @@ class Main
   def get_current_status
     puts "------------------------------"
     puts "【現在の在庫数】"
-    @drink.display_drink_list
+    @drink.display_all_drink_list
     puts "------------------------------"
     puts "投入金額：#{@total_money}円" 
     puts "------------------------------"
@@ -63,7 +62,6 @@ class Main
     end
   end
 
-
   def branch_route
     if @select_drink.nil? || @purchased_drinks != nil
       @close_program = ask_anything_want
@@ -77,7 +75,7 @@ class Main
       puts "何かお求めですか？(y/n)"
       @answer = gets.chomp
       if @answer == "n"
-        @purchasing.return_money if @purchasing.get_current_slot_money > 0
+        @money.return_money if @money.get_current_slot_money > 0
         return true
       elsif @answer != "y"
         puts "(y/n)を入力してください。"
@@ -103,11 +101,26 @@ class Main
     end
   end
 
+  def able_select_drink_list(slot_money)
+    @list = @drink.get_stock_drink_list.select { |n|
+      slot_money >= @drink.get_drink_price(n)
+    }.map{|n| n.to_s}
+    p @list
+  end
+
+  def decide_drink
+    while true
+      puts "欲しい飲み物を選択してください。"
+      select_drink = gets.chomp.to_sym
+      return select_drink if @list.include?(select_drink.to_s)
+    end
+  end
+
   def set_arguments_process
     select_drink_price = @drink.get_drink_price(@select_drink)
-    @sales_amount = @purchasing.set_sales_amount=(select_drink_price)
-    @total_money = @purchasing.get_current_slot_money
-    @drink.set_drink_stock=(@select_drink)
+    @sales_amount = @money.set_sales_amount=(select_drink_price)
+    @total_money = @money.get_current_slot_money
+    @drink.subtract_drink_stock(@select_drink)
     @drink.set_purchased_drinks=(@select_drink)
     @purchased_drinks = @drink.get_purchased_drinks
     puts "#{@select_drink.to_s}が出力されました！"

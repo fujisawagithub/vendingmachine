@@ -15,7 +15,7 @@ class Money
     puts "#{@slot_money}円払い戻しました！"
     @slot_money = 0
   end
-  
+
   def slot_money(money)
     unless MONEY.include?(money)
       puts "扱えないお金です。"
@@ -27,3 +27,21 @@ class Money
   end
 end
 
+class  Purchasing < Money
+
+  def initialize
+    super
+    @sales_amount = 0
+  end
+
+  def set_sales_amount=(price)
+    @slot_money -= price
+    @sales_amount += price
+  end
+
+  def get_sales_amount
+    @sales_amount
+  end
+
+
+end
