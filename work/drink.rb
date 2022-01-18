@@ -6,6 +6,6 @@ class Drink
 
   def get_drink_price(select_drink)
     @prices[select_drink]
-           end
+  end
 
 end
